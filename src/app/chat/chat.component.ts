@@ -93,18 +93,13 @@ export class ChatComponent implements OnInit {
     });
   }, 100);
     
-
-  
-
   }
-
 
   enviarMensagemClicando() {
     if (this.mensagem.conteudo != null && this.mensagem.conteudo != "") {
       this.enviar();
     }
   }
-
 
   enviarMensagem(event: KeyboardEvent) {
     if (event.keyCode == 13 && this.mensagem.conteudo != null) {
@@ -124,8 +119,5 @@ export class ChatComponent implements OnInit {
   emitir(mensagem: Mensagem) {
     this.socketService.emit("evento", mensagem);
   }
-
-
-
 
 }
