@@ -1,0 +1,24 @@
+<div class="container">
+
+    <div class="container-logo">
+        <ion-icon class="logo" name="chatbubbles-outline"></ion-icon>
+    </div>
+    <div class="card">
+        <form  [formGroup]="formulario" #formDir="ngForm" (ngSubmit)="enviarParaChat()">
+            <div class="container-input">
+                <label for="">Nome ou apelido:</label>
+                <input [maxLength]="30"    id="nome" type="text" formControlName="nome" [(ngModel)]="usuario.nome">
+               <div  class="container-mensgem-erro" *ngIf="formulario.controls['nome'].invalid && formulario.controls['nome'].touched ">
+                <label  class="mensagem-erro" *ngIf="formulario.controls['nome'].errors?.['required']">O nome ou apelido não pode estar vazio!</label>
+               </div>
+               
+            </div>
+
+
+            <button >Ir para o chat</button>
+        </form>
+
+
+    </div>
+
+</div>

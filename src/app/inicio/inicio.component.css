@@ -1,0 +1,107 @@
+.container{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    width: 100%;
+    height: 100%;
+}
+
+.container-logo{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100px;
+    width: 30%;
+    min-width: 300px;
+    margin-top: 3%;
+    padding: 20px;
+}
+.logo{
+    font-size: 80px;
+    color: var(--main-color);
+}
+.card{
+
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+
+    height: 250px;
+    min-height: 250px;
+    width: 30%;
+    min-width: 300px;
+    background-color: rgb(227, 233, 233);
+    border-radius: 10px;
+    
+}
+
+.card form{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    width: 100%;
+}
+.container-input{
+
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+    text-align: center;
+    align-self: center;
+    width: 80%;
+
+}
+
+input{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    
+    height: 35px;
+    border-radius: 10px;
+    margin: 10px 0;
+    padding: 4px 20px;  
+    border: 1px solid  rgb(197, 195, 195);
+    
+}
+
+
+input:focus{
+
+    outline: rgb(1, 1, 243);
+    box-shadow: 0 0 4px 2px rgb(1, 1, 243) ;
+    border: none;
+    
+}
+
+.container-input label{
+    font-size: 15px;
+}
+
+.container-mensgem-erro{
+   display: flex;
+   align-items: center;
+   justify-content: flex-start;
+   width: 100%;
+}
+.mensagem-erro{
+    color: red;
+    font-size: 12px;
+}
+
+.card  button{
+    width: 80%;
+    height: 35px;
+    border-radius: 10px;
+    margin: 10px 0;
+   cursor: pointer;
+    background-color: rgb(1, 1, 228); 
+    color: var(--main-text-color);   
+    
+}
