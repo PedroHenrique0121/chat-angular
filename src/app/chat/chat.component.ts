@@ -27,7 +27,7 @@ export class ChatComponent implements OnInit {
   usuario!: Usuario;
 
   informacoes!: Info[]
-  @Input() minhaVariavel!: number;
+  tamanho!: number;
 
 
   constructor(private location: Location,
@@ -42,7 +42,7 @@ export class ChatComponent implements OnInit {
     this.informacoes = new Array<Info>()
   }
 
-  
+
   ngOnInit(): void {
     this.socketService.on("error", (error: any) => {
       console.log("tipo do erro", + error)
@@ -53,7 +53,7 @@ export class ChatComponent implements OnInit {
     })
     this.verificarUsuario()
     this.on();
- 
+
   }
 
   verificarUsuario() {
@@ -75,7 +75,29 @@ export class ChatComponent implements OnInit {
     this.emitir(this.mensagem)
     this.mensagens.push(...[this.mensagem])
     this.mensagem = new Mensagem();
+    this.rolarAutomatico()
   }
+
+  rolarAutomatico() {
+    const scrollable = document.querySelector('.mensagens') as HTMLDivElement;
+     this.tamanho = scrollable?.scrollHeight
+   
+    console.log(scrollable?.scrollHeight)
+    console.log(this.tamanho)
+
+    setTimeout(function() {
+      // scrollable.scrollTop = scrollable.scrollHeight;
+      scrollable?.scrollTo({
+      top: scrollable.scrollHeight,
+      behavior: 'smooth',
+    });
+  }, 100);
+    
+
+  
+
+  }
+
 
   enviarMensagemClicando() {
     if (this.mensagem.conteudo != null && this.mensagem.conteudo != "") {
@@ -94,7 +116,9 @@ export class ChatComponent implements OnInit {
     this.socketService.on("evento", (event: Mensagem) => {
       this.mensagens.push(...[event])
       document.getElementById("mensagem")?.focus()
+      this.rolarAutomatico()
     })
+    
   }
 
   emitir(mensagem: Mensagem) {
