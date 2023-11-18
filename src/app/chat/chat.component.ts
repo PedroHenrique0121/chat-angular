@@ -29,6 +29,8 @@ export class ChatComponent implements OnInit {
   informacoes!: Info[]
   tamanho!: number;
 
+  connected: boolean = false;
+
 
   constructor(private location: Location,
     private router: Router,
@@ -44,13 +46,17 @@ export class ChatComponent implements OnInit {
 
 
   ngOnInit(): void {
+    this.initConnection()
+    .then(() => {
+      this.connected= true;
+    })
+    .catch(error=>{
+      this.connected= false;
+    })
     this.socketService.on("error", (error: any) => {
       console.log("tipo do erro", + error)
     });
 
-    this.socketService.on("connect", () => {
-      console.log("conectou")
-    })
     this.verificarUsuario()
     this.on();
 
@@ -80,19 +86,19 @@ export class ChatComponent implements OnInit {
 
   rolarAutomatico() {
     const scrollable = document.querySelector('.mensagens') as HTMLDivElement;
-     this.tamanho = scrollable?.scrollHeight
-   
+    this.tamanho = scrollable?.scrollHeight
+
     console.log(scrollable?.scrollHeight)
     console.log(this.tamanho)
 
-    setTimeout(function() {
+    setTimeout(function () {
       // scrollable.scrollTop = scrollable.scrollHeight;
       scrollable?.scrollTo({
-      top: scrollable.scrollHeight,
-      behavior: 'smooth',
-    });
-  }, 100);
-    
+        top: scrollable.scrollHeight,
+        behavior: 'smooth',
+      });
+    }, 100);
+
   }
 
   enviarMensagemClicando() {
@@ -113,11 +119,25 @@ export class ChatComponent implements OnInit {
       document.getElementById("mensagem")?.focus()
       this.rolarAutomatico()
     })
-    
+
   }
 
   emitir(mensagem: Mensagem) {
     this.socketService.emit("evento", mensagem);
+  }
+
+  async initConnection() {
+   this.connected= false;
+    try {
+      await this.socketService.connect();
+    }
+    catch (err) {
+    }
+  }
+
+  get connection(){
+    console.log(this.connected)
+    return this.connected;
   }
 
 }
