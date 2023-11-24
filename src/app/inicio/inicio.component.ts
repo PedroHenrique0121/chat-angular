@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { Form, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Usuario } from '../usuario';
+import { Usuario } from '../models/usuario';
 
 @Component({
   selector: 'app-inicio',

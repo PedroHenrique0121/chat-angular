@@ -1,12 +1,15 @@
-import { AfterViewInit, Component, ElementRef, Input, OnChanges, OnInit, Renderer2 } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, OnInit, Renderer2 } from '@angular/core';
 import { SocketIoConfig } from 'ngx-socket-io/src/config/socket-io.config';
-import { Mensagem } from '../mensagem';
+import { Mensagem } from '../models/mensagem';
 import { Socket } from 'ngx-socket-io';
 
-import { Usuario } from '../usuario';
+import { Usuario } from '../models/usuario';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 import { SocketService } from '../services/socket.service';
+import { AudioService } from '../services/audio.service';
+import { Midia } from '../models/midia.model';
+import { Message } from '@angular/compiler/src/i18n/i18n_ast';
 
 export type Info = {
   id: number,
@@ -23,24 +26,25 @@ export type U = {
 export class ChatComponent implements OnInit {
   mensagens!: Mensagem[];
   mensagem!: Mensagem;
-
+  src: HTMLAudioElement;
+  currentTime: number= 0;
   usuario!: Usuario;
 
   informacoes!: Info[]
   tamanho!: number;
-
+  gravando = false;
   connected: boolean = false;
 
 
   constructor(private location: Location,
     private router: Router,
     private socketService: SocketService,
-    private renderer: Renderer2, private el: ElementRef
+    private renderer: Renderer2, private el: ElementRef,
+    private audioService: AudioService,
+    private cdr: ChangeDetectorRef
   ) {
     this.mensagens = new Array<Mensagem>();
-    this.mensagem = new Mensagem();
-    this.mensagem.conteudo = ""
-    this.usuario = new Usuario()
+    this.mensagem = new Mensagem({conteudo: "", usuario: new Usuario()});
     this.informacoes = new Array<Info>()
   }
 
@@ -62,6 +66,11 @@ export class ChatComponent implements OnInit {
 
   }
 
+  get connection(){
+    console.log(this.connected)
+    return this.connected;
+  }
+
   verificarUsuario() {
     this.usuario = new Usuario()
     const state = this.location.getState() as U
@@ -74,10 +83,7 @@ export class ChatComponent implements OnInit {
   }
 
   enviar() {
-    this.mensagem.type = 1
-    this.mensagem.usuario = this.usuario
-    const horario = new Date().toLocaleTimeString();
-    this.mensagem.horario = horario
+    this.mensagem= new Mensagem({conteudo: this.mensagem.conteudo , type: 1, usuario: this.usuario, horario:  new Date().toLocaleTimeString()})
     this.emitir(this.mensagem)
     this.mensagens.push(...[this.mensagem])
     this.mensagem = new Mensagem();
@@ -86,10 +92,7 @@ export class ChatComponent implements OnInit {
 
   rolarAutomatico() {
     const scrollable = document.querySelector('.mensagens') as HTMLDivElement;
-    this.tamanho = scrollable?.scrollHeight
-
-    console.log(scrollable?.scrollHeight)
-    console.log(this.tamanho)
+    this.tamanho = scrollable?.scrollHeight;
 
     setTimeout(function () {
       // scrollable.scrollTop = scrollable.scrollHeight;
@@ -135,9 +138,43 @@ export class ChatComponent implements OnInit {
     }
   }
 
-  get connection(){
-    console.log(this.connected)
-    return this.connected;
+  enviarAudio() {
+    if (!this.gravando) {
+      this.gravando = true;
+      this.audioService.gravarAudio()
+    } else {
+      
+      this.gravando = false;
+
+      this.audioService.stopGravacao().then(
+        (midia: Midia) => {
+          this.mensagem= new Mensagem({ audio: new Midia(midia), type: 1, usuario: this.usuario, horario:  new Date().toLocaleTimeString()})
+          this.mensagem.audio.src = new Audio(this.mensagem.audio.url);
+          this.mensagem.audio.currentTime=0;
+          // console.log(Math.floor(midia.duration/60)+":"+ (Math.floor(midia.duration % 60 ) < 10? '0'+ Math.floor(midia.duration % 60 ):  Math.floor(midia.duration % 60 )))
+          this.mensagens.push(...[this.mensagem]);
+          this.mensagem= new Mensagem({});
+          this.cdr.detectChanges();
+          this.rolarAutomatico()
+        }
+      )
+    }
+  }
+
+  isNotEmptyString(str: any) {
+    if(!str){
+      return false;
+    }
+    return str.trim().length > 0;
+  }
+
+  onPlayOrStop(mensagem: Mensagem){
+   mensagem?.audio?.src.play();
+   mensagem?.audio?.src.addEventListener('timeupdate', () => {
+     // Atualiza o valor do controle deslizante durante a reprodução
+     mensagem.audio.currentTime = mensagem?.audio?.src.currentTime;
+   });
+
   }
 
 }
