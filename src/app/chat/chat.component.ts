@@ -27,7 +27,7 @@ export class ChatComponent implements OnInit {
   mensagens!: Mensagem[];
   mensagem!: Mensagem;
   src: HTMLAudioElement;
-  currentTime: number= 0;
+  currentTime: number = 0;
   usuario!: Usuario;
 
   informacoes!: Info[]
@@ -44,19 +44,19 @@ export class ChatComponent implements OnInit {
     private cdr: ChangeDetectorRef
   ) {
     this.mensagens = new Array<Mensagem>();
-    this.mensagem = new Mensagem({conteudo: "", usuario: new Usuario()});
+    this.mensagem = new Mensagem({ conteudo: "", usuario: new Usuario() });
     this.informacoes = new Array<Info>()
   }
 
 
   ngOnInit(): void {
     this.initConnection()
-    .then(() => {
-      this.connected= true;
-    })
-    .catch(error=>{
-      this.connected= false;
-    })
+      .then(() => {
+        this.connected = true;
+      })
+      .catch(error => {
+        this.connected = false;
+      })
     this.socketService.on("error", (error: any) => {
       console.log("tipo do erro", + error)
     });
@@ -66,7 +66,7 @@ export class ChatComponent implements OnInit {
 
   }
 
-  get connection(){
+  get connection() {
     console.log(this.connected)
     return this.connected;
   }
@@ -83,8 +83,8 @@ export class ChatComponent implements OnInit {
   }
 
   enviar() {
-    this.mensagem= new Mensagem({conteudo: this.mensagem.conteudo , type: 1, usuario: this.usuario, horario:  new Date().toLocaleTimeString()})
-    this.emitir(this.mensagem)
+    this.mensagem = new Mensagem({ conteudo: this.mensagem.conteudo, type: 1, usuario: this.usuario, horario: new Date().toLocaleTimeString() })
+    this.emitir(this.mensagem);
     this.mensagens.push(...[this.mensagem])
     this.mensagem = new Mensagem();
     this.rolarAutomatico()
@@ -118,7 +118,18 @@ export class ChatComponent implements OnInit {
 
   on() {
     this.socketService.on("evento", (event: Mensagem) => {
-      this.mensagens.push(...[event])
+       console.log(event)
+      if(!!event.audio.url){
+        this.mensagem = new Mensagem({ audio: new Midia(event?.audio), type: event?.type, usuario: event?.usuario, horario: event.horario })
+        this.mensagem.audio.src = new Audio(this.mensagem.audio.url);
+        this.mensagem.audio.currentTime = 0;
+      }else{
+        this.mensagem = new Mensagem({ conteudo: event.conteudo, type: event?.type, usuario: event?.usuario, horario: event.horario })
+      }
+      // console.log(Math.floor(midia.duration/60)+":"+ (Math.floor(midia.duration % 60 ) < 10? '0'+ Math.floor(midia.duration % 60 ):  Math.floor(midia.duration % 60 )))
+      this.mensagens.push(...[this.mensagem]);
+      this.mensagem = new Mensagem({});
+      this.cdr.detectChanges();
       document.getElementById("mensagem")?.focus()
       this.rolarAutomatico()
     })
@@ -130,7 +141,7 @@ export class ChatComponent implements OnInit {
   }
 
   async initConnection() {
-   this.connected= false;
+    this.connected = false;
     try {
       await this.socketService.connect();
     }
@@ -143,17 +154,18 @@ export class ChatComponent implements OnInit {
       this.gravando = true;
       this.audioService.gravarAudio()
     } else {
-      
+
       this.gravando = false;
 
-      this.audioService.stopGravacao().then(
+      this.audioService.recordingStop().then(
         (midia: Midia) => {
-          this.mensagem= new Mensagem({ audio: new Midia(midia), type: 1, usuario: this.usuario, horario:  new Date().toLocaleTimeString()})
+          this.mensagem = new Mensagem({ audio: new Midia(midia), type: 1, usuario: this.usuario, horario: new Date().toLocaleTimeString() })
           this.mensagem.audio.src = new Audio(this.mensagem.audio.url);
-          this.mensagem.audio.currentTime=0;
+          this.mensagem.audio.currentTime = 0;
           // console.log(Math.floor(midia.duration/60)+":"+ (Math.floor(midia.duration % 60 ) < 10? '0'+ Math.floor(midia.duration % 60 ):  Math.floor(midia.duration % 60 )))
           this.mensagens.push(...[this.mensagem]);
-          this.mensagem= new Mensagem({});
+          this.emitir(this.mensagem);
+          this.mensagem = new Mensagem({});
           this.cdr.detectChanges();
           this.rolarAutomatico()
         }
@@ -162,18 +174,18 @@ export class ChatComponent implements OnInit {
   }
 
   isNotEmptyString(str: any) {
-    if(!str){
+    if (!str) {
       return false;
     }
     return str.trim().length > 0;
   }
 
-  onPlayOrStop(mensagem: Mensagem){
-   mensagem?.audio?.src.play();
-   mensagem?.audio?.src.addEventListener('timeupdate', () => {
-     // Atualiza o valor do controle deslizante durante a reprodução
-     mensagem.audio.currentTime = mensagem?.audio?.src.currentTime;
-   });
+  onPlayOrStop(mensagem: Mensagem) {
+    mensagem?.audio?.src.play();
+    mensagem?.audio?.src.addEventListener('timeupdate', () => {
+      // Atualiza o valor do controle deslizante durante a reprodução
+      mensagem.audio.currentTime = mensagem?.audio?.src.currentTime;
+    });
 
   }
 

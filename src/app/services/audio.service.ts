@@ -21,7 +21,7 @@ export class AudioService {
       })
   }
 
-  async stopGravacao() : Promise<Midia> {
+  async recordingStop() : Promise<Midia> {
     this.recorder.stop();
     // Cria uma Promise que será resolvida quando o evento "dataavailable" for disparado
     const dataPromise = new Promise<Midia>((resolve) => {
