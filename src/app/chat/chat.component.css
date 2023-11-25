@@ -21,7 +21,7 @@
     border-bottom-right-radius: 10px;
 }
 
-.container-usuarios {
+/* .container-usuarios {
 
     display: flex;
     flex-direction: column;
@@ -31,7 +31,7 @@
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
 
-}
+} */
 
 .header {
     height: 30px;
@@ -64,22 +64,22 @@
     cursor: pointer;
 }
 
-.listagem-usuarios {
+/* .listagem-usuarios {
     display: flex;
     flex-direction: column;
     height: calc(100% - 50px);
     overflow-y: auto;
 
-}
+} */
 
-.usuario {
+/* .usuario {
     padding: 10px 20px;
     display: flex;
     flex-direction: row;
     height: 40px;
     align-items: center;
     color: var(--main-text-color);
-}
+} */
 
 .nome-usuario {
     margin-left: 20px;
