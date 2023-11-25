@@ -37,7 +37,7 @@ export class AudioService {
         const audioBlob = new Blob(this.blob, {
           type: 'audio/ogg;codecs=opus',
         });
-        const audioURL = URL.createObjectURL(audioBlob);
+        // const audioURL = URL.createObjectURL(audioBlob);
         const audioContext = new AudioContext();
         const audioBuffer = await audioContext.decodeAudioData(await audioBlob.arrayBuffer());
          const duration = audioBuffer.duration;

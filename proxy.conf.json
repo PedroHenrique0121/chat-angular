@@ -1,0 +1,7 @@
+{
+    "/api": {
+      "target": "https://pedro-real-time-chat.netlify.app",
+      "secure": false
+    }
+  }
+  

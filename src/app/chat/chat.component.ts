@@ -154,9 +154,7 @@ export class ChatComponent implements OnInit {
       this.gravando = true;
       this.audioService.gravarAudio()
     } else {
-
       this.gravando = false;
-
       this.audioService.recordingStop().then(
         (midia: Midia) => {
           console.log(midia)
