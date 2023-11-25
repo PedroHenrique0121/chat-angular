@@ -118,13 +118,43 @@ export class ChatComponent implements OnInit {
 
   on() {
     this.socketService.on("evento", (event: Mensagem) => {
-       console.log(event)
-      if(!!event.audio.url){
-        this.mensagem = new Mensagem({ audio: new Midia(event?.audio), type: event?.type, usuario: event?.usuario, horario: event.horario })
-        this.mensagem.audio.src = new Audio(this.mensagem.audio.sanitizerUrl?.changingThisBreaksApplicationSecurity);
-        this.mensagem.audio.currentTime = 0;
-      }else{
-        this.mensagem = new Mensagem({ conteudo: event.conteudo, type: event?.type, usuario: event?.usuario, horario: event.horario })
+      console.log(event)
+      if (!!event.audio.url) {
+
+
+        const blob = new Blob([this.mensagem.audio.blob], {
+          type: 'audio/ogg;codecs=opus',
+        });
+
+        const normalUrl = URL.createObjectURL(blob);
+
+        const audio = new Audio(normalUrl);
+        console.log(normalUrl)
+        audio.play();
+
+        this.mensagem = new Mensagem({
+          audio: new Midia(
+            {
+              blob,
+              currentTime: 0,
+              duration: audio.duration,
+              normalUrl,
+              src: audio,
+              url: normalUrl
+            }),
+          type: event?.type,
+          usuario: event?.usuario,
+          horario: event.horario
+        })
+
+      } else {
+        this.mensagem = new Mensagem(
+          {
+            conteudo: event.conteudo,
+            type: event?.type,
+            usuario: event?.usuario,
+            horario: event.horario
+          })
       }
       // console.log(Math.floor(midia.duration/60)+":"+ (Math.floor(midia.duration % 60 ) < 10? '0'+ Math.floor(midia.duration % 60 ):  Math.floor(midia.duration % 60 )))
       this.mensagens.push(...[this.mensagem]);
@@ -180,9 +210,10 @@ export class ChatComponent implements OnInit {
   }
 
   onPlayOrStop(mensagem: Mensagem) {
-    mensagem.audio.src.preload= "metadata";
-    mensagem?.audio?.src?.play();
-    mensagem?.audio?.src?.addEventListener('timeupdate', () => {
+    const audio = new Audio(mensagem.audio.normalUrl);
+   audio.play();
+   
+   audio.addEventListener('timeupdate', () => {
       // Atualiza o valor do controle deslizante durante a reprodução
       mensagem.audio.currentTime = mensagem?.audio?.src?.currentTime;
     });
