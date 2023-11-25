@@ -1,4 +1,4 @@
-/* .container {
+.container {
     height: 100%;
     width: 100%;
     display: flex;
@@ -148,7 +148,7 @@
     overflow-y: auto;
 }
 
-.player-container {
+/* .player-container {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -172,7 +172,7 @@
 
 .timeline {
     border: none;
-}
+} */
 
 .footer {
 
@@ -336,4 +336,4 @@
         height: 100%;
         width: 100%;
     }
-} */
+}
