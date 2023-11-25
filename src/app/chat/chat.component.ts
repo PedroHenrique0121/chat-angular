@@ -121,7 +121,7 @@ export class ChatComponent implements OnInit {
        console.log(event)
       if(!!event.audio.url){
         this.mensagem = new Mensagem({ audio: new Midia(event?.audio), type: event?.type, usuario: event?.usuario, horario: event.horario })
-        this.mensagem.audio.src = new Audio(this.mensagem.audio.url);
+        this.mensagem.audio.src = new Audio(this.mensagem.audio.sanitizerUrl?.changingThisBreaksApplicationSecurity);
         this.mensagem.audio.currentTime = 0;
       }else{
         this.mensagem = new Mensagem({ conteudo: event.conteudo, type: event?.type, usuario: event?.usuario, horario: event.horario })
@@ -159,6 +159,7 @@ export class ChatComponent implements OnInit {
 
       this.audioService.recordingStop().then(
         (midia: Midia) => {
+          console.log(midia)
           this.mensagem = new Mensagem({ audio: new Midia(midia), type: 1, usuario: this.usuario, horario: new Date().toLocaleTimeString() })
           this.mensagem.audio.src = new Audio(this.mensagem.audio.url);
           this.mensagem.audio.currentTime = 0;
@@ -181,10 +182,11 @@ export class ChatComponent implements OnInit {
   }
 
   onPlayOrStop(mensagem: Mensagem) {
-    mensagem?.audio?.src.play();
-    mensagem?.audio?.src.addEventListener('timeupdate', () => {
+    mensagem.audio.src.preload= "metadata";
+    mensagem?.audio?.src?.play();
+    mensagem?.audio?.src?.addEventListener('timeupdate', () => {
       // Atualiza o valor do controle deslizante durante a reprodução
-      mensagem.audio.currentTime = mensagem?.audio?.src.currentTime;
+      mensagem.audio.currentTime = mensagem?.audio?.src?.currentTime;
     });
 
   }
