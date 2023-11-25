@@ -6,7 +6,16 @@
   <title>Chat</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' blob:;">
+  <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src
+          'self'
+          'unsafe-inline'
+          https://chat-mztq.onrender.com/
+          wss://chat-mztq.onrender.com/socket.io/
+          blob:;"
+  />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,700;1,300;1,700;1,900&display=swap"
