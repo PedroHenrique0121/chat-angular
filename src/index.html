@@ -11,6 +11,16 @@
   connect-src 'self' https://chat-mztq.onrender.com;
   img-src https://* 'self' data:;
   media-src 'self' blob: data:;">
+  <meta
+      http-equiv="Content-Security-Policy"
+      content="
+        default-src
+          'self'
+          'unsafe-inline'
+          https://chat-mztq.onrender.com/
+          wss://chat-mztq.onrender.com/socket.io/
+          blob:;"
+  />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,300;0,700;1,300;1,700;1,900&display=swap"
