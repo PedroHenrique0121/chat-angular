@@ -1,4 +1,4 @@
-.container {
+/* .container {
     height: 100%;
     width: 100%;
     display: flex;
@@ -95,8 +95,6 @@
     font-size: 40px;
     cursor: pointer;
     color: var(--main-color);
-
-
 }
 
 .pesquisa {
@@ -106,8 +104,6 @@
     width: 90%;
     align-items: center;
     color: var(--main-text-color);
-
-
 }
 
 .pesquisa input {
@@ -123,7 +119,6 @@
 
 }
 
-/* estilização referente ao chat */
 .container-mensagens {
     display: flex;
     flex-direction: column;
@@ -341,4 +336,4 @@
         height: 100%;
         width: 100%;
     }
-}
+} */
