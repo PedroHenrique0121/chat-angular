@@ -28,6 +28,13 @@ export class AudioService {
     this.recorder.stop();
     // Cria uma Promise que será resolvida quando o evento "dataavailable" for disparado
     const dataPromise = new Promise<Midia>((resolve) => {
+      this.recorder.addEventListener("error", (event) => {
+        console.error('Erro na gravação:', event);
+      });
+      
+      // ...
+      
+     
       this.recorder.addEventListener("dataavailable", async (event) => {
         this.blob = []
 
@@ -35,7 +42,7 @@ export class AudioService {
         //test
 
         const audioBlob = new Blob(this.blob, {
-          type: 'audio/ogg;codecs=opus',
+          type: 'audio/mp3',
         });
         // const audioURL = URL.createObjectURL(audioBlob);
         const audioContext = new AudioContext();
@@ -51,7 +58,9 @@ export class AudioService {
         );
 
         this._midia = new Midia({ blob: audioBlob, title: audioName, normalUrl, sanitizerUrl, currentTime: 0, duration, url: normalUrl });
-
+        audioContext.addEventListener("error", (event) => {
+          console.error('Erro na decodificação de áudio:', event);
+        });
         // const audioBlob = new Blob(this.blob, { type: 'audio/mp3' });
         // const audioURL = URL.createObjectURL(audioBlob);
         // const audioContext = new AudioContext();

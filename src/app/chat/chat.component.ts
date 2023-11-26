@@ -118,48 +118,30 @@ export class ChatComponent implements OnInit {
 
   on() {
     this.socketService.on("evento", (event: Mensagem) => {
-      console.log(event)
-      if (!!event.audio.url) {
+       console.log(event)
+      if(!!event.audio.url){
 
-
-        const blob = new Blob([this.mensagem.audio.blob], {
-          type: 'audio/ogg;codecs=opus',
+        const blob = new Blob([event.audio.blob], {
+          type: 'audio/mp3',
         });
-
+        
         const normalUrl = URL.createObjectURL(blob);
 
-        const audio = new Audio(normalUrl);
+        this.mensagem = new Mensagem({ audio: new Midia(event?.audio), type: event?.type, usuario: event?.usuario, horario: event.horario })
+        this.mensagem.audio.blob= blob;
+        this.mensagem.audio.src = new Audio(normalUrl);
+        this.mensagem.audio.currentTime = 0;
+
+        console.log( this.mensagem.audio.src);
         console.log(normalUrl)
-        audio.play();
 
-        this.mensagem = new Mensagem({
-          audio: new Midia(
-            {
-              blob,
-              currentTime: 0,
-              duration: audio.duration,
-              normalUrl,
-              src: audio,
-              url: normalUrl
-            }),
-          type: event?.type,
-          usuario: event?.usuario,
-          horario: event.horario
-        })
 
-      } else {
-        this.mensagem = new Mensagem(
-          {
-            conteudo: event.conteudo,
-            type: event?.type,
-            usuario: event?.usuario,
-            horario: event.horario
-          })
+      }else{
+        this.mensagem = new Mensagem({ conteudo: event.conteudo, type: event?.type, usuario: event?.usuario, horario: event.horario })
       }
       // console.log(Math.floor(midia.duration/60)+":"+ (Math.floor(midia.duration % 60 ) < 10? '0'+ Math.floor(midia.duration % 60 ):  Math.floor(midia.duration % 60 )))
       this.mensagens.push(...[this.mensagem]);
       this.mensagem = new Mensagem({});
-      this.cdr.detectChanges();
       document.getElementById("mensagem")?.focus()
       this.rolarAutomatico()
     })
@@ -209,14 +191,20 @@ export class ChatComponent implements OnInit {
     return str.trim().length > 0;
   }
 
-  onPlayOrStop(mensagem: Mensagem) {
-    const audio = new Audio(mensagem.audio.normalUrl);
-   audio.play();
-   
-   audio.addEventListener('timeupdate', () => {
-      // Atualiza o valor do controle deslizante durante a reprodução
-      mensagem.audio.currentTime = mensagem?.audio?.src?.currentTime;
+  async onPlayOrStop(mensagem: Mensagem) {
+    const m = new Mensagem(mensagem)
+    console.log(mensagem);
+    mensagem.audio.src.play();
+    mensagem.audio.src.addEventListener('timeupdate', () => {
+      mensagem.audio.currentTime = m?.audio?.src?.currentTime;
     });
+
+    mensagem.audio.src.addEventListener('pause', () => {
+    })
+
+    mensagem.audio.src.addEventListener('ended', () => {
+      mensagem.audio.currentTime = mensagem.audio.duration;
+    })
 
   }
 
