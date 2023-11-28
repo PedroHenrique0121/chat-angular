@@ -1,5 +1,5 @@
 export class Midia {
-    src: HTMLAudioElement;
+    audio: HTMLAudioElement;
     duration: number;
     url: string;
     currentTime: number;

@@ -1,22 +1,22 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, Input, OnChanges, OnInit, Renderer2 } from '@angular/core';
 import { SocketIoConfig } from 'ngx-socket-io/src/config/socket-io.config';
-import { Mensagem } from '../models/mensagem';
+import { Message } from '../global/models/message.model';
 import { Socket } from 'ngx-socket-io';
 
-import { Usuario } from '../models/usuario';
+import { User } from '../global/models/user.model';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
-import { SocketService } from '../services/socket.service';
-import { AudioService } from '../services/audio.service';
-import { Midia } from '../models/midia.model';
-import { Message } from '@angular/compiler/src/i18n/i18n_ast';
+
+import { Midia } from '../global/models/midia.model';
+import { SocketService } from '../global/services/socket.service';
+import { AudioService } from '../global/services/audio.service';
 
 export type Info = {
   id: number,
   host: string,
 }
 export type U = {
-  usuario: Usuario;
+  user: User;
 }
 @Component({
   selector: 'app-chat',
@@ -24,11 +24,11 @@ export type U = {
   styleUrls: ['./chat.component.css']
 })
 export class ChatComponent implements OnInit {
-  mensagens!: Mensagem[];
-  mensagem!: Mensagem;
+  messages: Message[];
+  message: Message;
   src: HTMLAudioElement;
   currentTime: number = 0;
-  usuario!: Usuario;
+  user!: User;
 
   informacoes!: Info[]
   tamanho!: number;
@@ -43,8 +43,8 @@ export class ChatComponent implements OnInit {
     private audioService: AudioService,
     private cdr: ChangeDetectorRef
   ) {
-    this.mensagens = new Array<Mensagem>();
-    this.mensagem = new Mensagem({ conteudo: "", usuario: new Usuario() });
+    this.messages = new Array<Message>();
+    this.message = new Message({ content: "", user: new User() });
     this.informacoes = new Array<Info>()
   }
 
@@ -58,10 +58,10 @@ export class ChatComponent implements OnInit {
         this.connected = false;
       })
     this.socketService.on("error", (error: any) => {
-      console.log("tipo do erro", + error)
+      console.log("tipo do erro", + error);
     });
 
-    this.verificarUsuario()
+    this.verifyUser();
     this.on();
 
   }
@@ -71,22 +71,27 @@ export class ChatComponent implements OnInit {
     return this.connected;
   }
 
-  verificarUsuario() {
-    this.usuario = new Usuario()
-    const state = this.location.getState() as U
-    console.log(state)
-    if (state.usuario != null) {
-      this.usuario = state.usuario;
+  verifyUser() {
+    this.user = new User()
+    const state = this.location.getState() as U;
+    if (state.user != null) {
+      this.user = state.user;
     } else {
-      this.router.navigateByUrl("/login")
+      this.router.navigateByUrl("/sign-in")
     }
   }
 
-  enviar() {
-    this.mensagem = new Mensagem({ conteudo: this.mensagem.conteudo, type: 1, usuario: this.usuario, horario: new Date().toLocaleTimeString() })
-    this.emitir(this.mensagem);
-    this.mensagens.push(...[this.mensagem])
-    this.mensagem = new Mensagem();
+  send() {
+    this.message = new Message({
+      content: this.message.content,
+      type: 1,
+      user: new User(this.user),
+      horario: new Date().toLocaleTimeString()
+    })
+
+    this.emitir(this.message);
+    this.messages.push(...[this.message])
+    this.message = new Message();
     this.rolarAutomatico()
   }
 
@@ -105,50 +110,55 @@ export class ChatComponent implements OnInit {
   }
 
   enviarMensagemClicando() {
-    if (this.mensagem.conteudo != null && this.mensagem.conteudo != "") {
-      this.enviar();
+    if (this.message.content != null && this.message.content != "") {
+      this.send();
     }
   }
 
   enviarMensagem(event: KeyboardEvent) {
-    if (event.keyCode == 13 && this.mensagem.conteudo != null) {
-      this.enviar();
+    if (event.keyCode == 13 && this.message.content != null) {
+      this.send();
     }
   }
 
   on() {
-    this.socketService.on("evento", (event: Mensagem) => {
-       console.log(event)
-      if(!!event.audio.url){
-
-        const blob = new Blob([event.audio.blob], {
+    this.socketService.on("evento", (event: Message) => {
+      if (!!event.midia.blob) {
+        const blob = new Blob([event.midia.blob], {
           type: 'audio/mp3',
         });
-        
+
         const normalUrl = URL.createObjectURL(blob);
 
-        this.mensagem = new Mensagem({ audio: new Midia(event?.audio), type: event?.type, usuario: event?.usuario, horario: event.horario })
-        this.mensagem.audio.blob= blob;
-        this.mensagem.audio.src = new Audio(normalUrl);
-        this.mensagem.audio.currentTime = 0;
+        this.message = new Message({
+          midia: new Midia({
+            blob,
+            audio: new Audio(normalUrl),
+            currentTime: 0
+          }),
+          type: event?.type,
+          user: new User(event?.user),
+          horario: event.horario
+        })
 
-        console.log( this.mensagem.audio.src);
-        console.log(normalUrl)
-
-
-      }else{
-        this.mensagem = new Mensagem({ conteudo: event.conteudo, type: event?.type, usuario: event?.usuario, horario: event.horario })
+      } else {
+        this.message = new Message({
+          content: event.content,
+          type: event?.type,
+          user: new User(event?.user),
+          horario: event.horario
+        })
       }
       // console.log(Math.floor(midia.duration/60)+":"+ (Math.floor(midia.duration % 60 ) < 10? '0'+ Math.floor(midia.duration % 60 ):  Math.floor(midia.duration % 60 )))
-      this.mensagens.push(...[this.mensagem]);
-      this.mensagem = new Mensagem({});
+      this.messages.push(...[this.message]);
+      this.message = new Message({});
       document.getElementById("mensagem")?.focus()
       this.rolarAutomatico()
     })
 
   }
 
-  emitir(mensagem: Mensagem) {
+  emitir(mensagem: Message) {
     this.socketService.emit("evento", mensagem);
   }
 
@@ -164,19 +174,28 @@ export class ChatComponent implements OnInit {
   enviarAudio() {
     if (!this.gravando) {
       this.gravando = true;
-      this.audioService.gravarAudio()
+      this.audioService.gravarAudio();
     } else {
       this.gravando = false;
       this.audioService.recordingStop().then(
         (midia: Midia) => {
           console.log(midia)
-          this.mensagem = new Mensagem({ audio: new Midia(midia), type: 1, usuario: this.usuario, horario: new Date().toLocaleTimeString() })
-          this.mensagem.audio.src = new Audio(this.mensagem.audio.url);
-          this.mensagem.audio.currentTime = 0;
+          this.message = new Message({
+            midia: new Midia({
+              audio: new Audio(midia.normalUrl),
+              currentTime: 0,
+              blob: midia.blob,
+              url: midia.url,
+            }),
+            type: 1,
+            user: new User(this.user),
+            horario: new Date().toLocaleTimeString()
+          })
+
           // console.log(Math.floor(midia.duration/60)+":"+ (Math.floor(midia.duration % 60 ) < 10? '0'+ Math.floor(midia.duration % 60 ):  Math.floor(midia.duration % 60 )))
-          this.mensagens.push(...[this.mensagem]);
-          this.emitir(this.mensagem);
-          this.mensagem = new Mensagem({});
+          this.messages.push(...[this.message]);
+          this.emitir(this.message);
+          this.message = new Message({});
           this.cdr.detectChanges();
           this.rolarAutomatico()
         }
@@ -191,21 +210,19 @@ export class ChatComponent implements OnInit {
     return str.trim().length > 0;
   }
 
-  async onPlayOrStop(mensagem: Mensagem) {
-    const m = new Mensagem(mensagem)
+  async onPlayOrStop(mensagem: Message) {
+    const m = new Message(mensagem)
     console.log(mensagem);
-    mensagem.audio.src.play();
-    mensagem.audio.src.addEventListener('timeupdate', () => {
-      mensagem.audio.currentTime = m?.audio?.src?.currentTime;
+    m.midia.audio.play();
+    m.midia.audio.addEventListener('timeupdate', () => {
+      mensagem.midia.currentTime = m.midia.audio.currentTime;
     });
 
-    mensagem.audio.src.addEventListener('pause', () => {
+    m.midia.audio.addEventListener('pause', () => {
     })
 
-    mensagem.audio.src.addEventListener('ended', () => {
-      mensagem.audio.currentTime = mensagem.audio.duration;
+    m.midia.audio.addEventListener('ended', () => {
+      mensagem.midia.currentTime = mensagem.midia.audio.duration;
     })
-
   }
-
 }

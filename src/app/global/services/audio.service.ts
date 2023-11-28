@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Midia } from '../models/midia.model';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Subject } from 'rxjs';
+import { Midia } from '../models/midia.model';
 
 @Injectable({
   providedIn: 'root'
@@ -32,9 +32,6 @@ export class AudioService {
         console.error('Erro na gravação:', event);
       });
       
-      // ...
-      
-     
       this.recorder.addEventListener("dataavailable", async (event) => {
         this.blob = []
 

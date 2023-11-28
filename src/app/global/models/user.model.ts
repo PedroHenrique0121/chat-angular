@@ -1,8 +1,8 @@
-export class Usuario{
+export class User{
      
     nome: string;
 
-    constructor(attrs?: Partial<Usuario>){
+    constructor(attrs?: Partial<User>){
         Object.assign(this,attrs);
     }
 }

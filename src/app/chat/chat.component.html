@@ -32,37 +32,32 @@
             <div class="container-mensagens">
                 <div class="header-mensagem">
                     <ion-icon class="foto-usuario" name="person-circle"></ion-icon>
-                    <h3>{{usuario.nome + " (você)"}}</h3>
+                    <h3>{{user.nome}}</h3>
 
                 </div>
                 <div class="mensagens">
-                    <div [ngClass]="{'m': mensagem.type===1, 'r': mensagem.type===2}"
-                        *ngFor="let mensagem of mensagens">
-
-                        <ng-container *ngIf="!mensagem.audio.src && isNotEmptyString(mensagem.conteudo)">
-                            <div id="mensagem"
-                                [ngClass]="{'send-mensagem': mensagem.type===1, 'recepted-mensagem': mensagem.type===2}">
-                                <p class="nome-usuario-mensagem">{{mensagem.type===1? "Você:": mensagem.usuario.nome +
-                                    ":"
-                                    }}
+                    <div *ngFor="let message of messages" [ngClass]="{'m': message.type===1, 'r': message.type===2}">
+                        <ng-container *ngIf="!message.midia.audio && isNotEmptyString(message.content)">
+                            <div id="mensagem" [ngClass]="{'send-mensagem': message.type===1, 'recepted-mensagem': message.type===2}">
+                                <p class="nome-usuario-mensagem">
+                                    {{message.type===1? "Você:": message.user.nome + ":" }}
                                 </p>
-                                {{mensagem.conteudo}}
+                                {{message.content}}
 
                             </div>
                             <div class="horario-mensagem">
-                                <p>{{mensagem.horario }}
+                                <p>{{message.horario }}
                                 </p>
                             </div>
                         </ng-container>
                         
-                        <ng-container *ngIf="mensagem.audio.src">
-                            <div  id="mensagem"
-                            [ngClass]="{'send-mensagem': mensagem.type===1, 'recepted-mensagem': mensagem.type===2}">
-                            <p class="nome-usuario-mensagem">{{mensagem.type===1? "Você:": mensagem.usuario.nome + ":"
-                                }}
+                        <ng-container *ngIf="message.midia.audio">
+                            <div  id="mensagem" [ngClass]="{'send-mensagem': message.type===1, 'recepted-mensagem': message.type===2}">
+                            <p class="nome-usuario-mensagem">
+                                {{message.type===1? "Você:": message.user.nome + ":" }}
                             </p>
                             <div class="player-container">
-                                <button  class="button-play-pause" (click)="onPlayOrStop(mensagem)" >
+                                <button  class="button-play-pause" (click)="onPlayOrStop(message)" >
                                     <ion-icon class="icons-player" [name]="'play'"></ion-icon>
                                 </button>
                                 <input 
@@ -72,14 +67,14 @@
                                     name="audio"
                                     id="progress-bar"
                                     min="0"
-                                    [max]="mensagem.audio.duration"
-                                    [(ngModel)]="mensagem.audio.currentTime"
+                                    [max]="message.midia.audio.duration"
+                                    [(ngModel)]="message.midia.audio.currentTime"
                                 />
                             </div>
 
                         </div>
                         <div class="horario-mensagem">
-                            <p>{{mensagem.horario }}</p>
+                            <p>{{message.horario }}</p>
                         </div>
 
                         </ng-container>
@@ -91,7 +86,7 @@
                     <div class="envio">
                         <ion-icon class="icones-message" name="apps-outline"></ion-icon>
                         <input *ngIf="!gravando" type="text" placeholder="Digite uma mensagem..."
-                            [(ngModel)]="mensagem.conteudo" (keypress)="enviarMensagem($event)">
+                            [(ngModel)]="message.content" (keypress)="enviarMensagem($event)">
 
                         <div class="audio" *ngIf="gravando">
                             <button style="background-color: transparent;">

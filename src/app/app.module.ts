@@ -11,17 +11,17 @@ import { ChatComponent } from './chat/chat.component';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { SocketIoModule, SocketIoConfig } from "ngx-socket-io";
-import { InicioComponent } from './inicio/inicio.component'
-import { SocketService } from './services/socket.service';
+import { InicioComponent } from './global/components/inicio/inicio.component'
+
+import { ChatModule } from './chat/chat.module';
+import { SocketService } from './global/services/socket.service';
+import { GlobalModule } from './global/global.module';
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    LayouteComponent,
-    
-    ChatComponent,
-         InicioComponent
+    LayouteComponent
   ],
   imports: [
     BrowserModule,
@@ -31,9 +31,9 @@ import { SocketService } from './services/socket.service';
     FormsModule,
     SocketIoModule,
     FormsModule,
-    ReactiveFormsModule
-   
-    
+    ReactiveFormsModule,
+    ChatModule,
+    GlobalModule
   ],
   providers: [SocketService],
   bootstrap: [AppComponent]
